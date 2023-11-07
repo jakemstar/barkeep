@@ -15,22 +15,36 @@ datasource db {
     relationMode = "prisma"
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Ingredient {
+id                  Int      @id @default(autoincrement())
+    name            String
+    description     String?
+    drinks          DrinkIngredients[]
+}
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
+model Drink {
+    id              Int      @id @default(autoincrement())
+    name            String
+    description     String?
+    ingredients     DrinkIngredients[]
+}
 
-    @@index([name])
+model DrinkIngredients {
+    drink           Drink @relation(fields: [drinkId], references: [id])
+    drinkId         Int
+    ingredient      Ingredient @relation(fields: [ingredientId], references: [id])
+    ingredientId    Int
+
+    @@id([drinkId, ingredientId])
+    @@index([drinkId])
+    @@index([ingredientId])
 }
 
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
     userId            String
+    publicUserName    String?
     type              String
     provider          String
     providerAccountId String
@@ -63,7 +77,6 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
 }
 
 model VerificationToken {
